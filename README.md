@@ -1,6 +1,7 @@
 # Embers — Bounty Board with Earned Trust + Passport NFT
 
 **NEAR Hackathon 2026** · Tracks: `social`, `nfts` · Solo builder: Avi · Team size `1`
+> Built with AI assistance (Muse)
 Payout: `hackat.near` · Dev: `hackat.testnet` · Demo: `embers-demo.mp4`
 
 ## What it is (problem → product → NEAR fit)
