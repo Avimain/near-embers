@@ -4,3 +4,5 @@ target/
 */target/
 *.wasm
 .env*
+submission-payload.draft.json
+.env*
