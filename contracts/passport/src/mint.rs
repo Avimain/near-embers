@@ -49,11 +49,13 @@ impl Contract {
     /// Demo: owner (hackat.testnet) calls. Production: DAO proposal FunctionCall.
     pub fn credit_bounties(&mut self, token_id: TokenId, count: u32) {
         let predecessor = env::predecessor_account_id();
-        let current = env::current_account_id();
-        assert!(
-            predecessor == current || predecessor.to_string() == "genesis.hackat.testnet",
-            "Only DAO or owner may credit bounties"
-        );
+        let is_dao = predecessor.to_string() == "genesis.hackat.testnet";
+        let is_token_owner = self
+            .tokens_by_id
+            .get(&token_id)
+            .map(|t| t.owner_id == predecessor)
+            .unwrap_or(false);
+        assert!(is_dao || is_token_owner, "Only DAO or token owner may credit");
         let n = self.bounty_count.get(&token_id).unwrap_or(0) + count;
         self.bounty_count.insert(&token_id, &n);
         let step: u128 = 5_000_000_000_000_000_000; // 0.005 NEAR per bounty (demo)
