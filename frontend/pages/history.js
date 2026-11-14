@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const PASSPORT = 'passport.hackat.testnet'
+const PASSPORT = 'passport2.hackat.testnet'
 const RPC = 'https://rpc.testnet.near.org'
 
 async function view(accountId, method, args = {}) {

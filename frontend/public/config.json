@@ -1,1 +1,7 @@
-{"config":{"network":"testnet","contracts":{"dao":"genesis.hackat.testnet","passport":"passport.hackat.testnet"}}}
+{
+  "network": "testnet",
+  "contracts": {
+    "dao": "genesis.hackat.testnet",
+    "passport": "passport2.hackat.testnet"
+  }
+}

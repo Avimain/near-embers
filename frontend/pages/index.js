@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const PASSPORT = 'passport.hackat.testnet'
+const PASSPORT = 'passport2.hackat.testnet'
 const RPC = 'https://rpc.testnet.near.org'
 
 async function view(accountId, method, args = {}) {
@@ -66,12 +66,12 @@ export default function Home() {
       <section>
         <h2>4 · DAO cross-contract credit (no new multisig)</h2>
         <p>DAO creates a <b>FunctionCall</b> proposal → <code>passport.credit_bounties(token_id, count)</code>. The contract only accepts this from the DAO or the contract owner. Verify with:</p>
-        <code>near view passport.hackat.testnet create_credit_args &#123;token_id: EMBER-001, count: 1&#125;</code>
+        <code>near view passport2.hackat.testnet create_credit_args &#123;token_id: EMBER-001, count: 1&#125;</code>
       </section>
 
       <p><a href="/history">Reputation history →</a></p>
       <footer>
-        <p>DAO <code>genesis.hackat.testnet</code> · Passport <code>passport.hackat.testnet</code> · <a href="https://explorer.testnet.near.org">explorer.testnet.near.org</a></p>
+        <p>DAO <code>genesis.hackat.testnet</code> · Passport <code>passport2.hackat.testnet</code> · <a href="https://explorer.testnet.near.org">explorer.testnet.near.org</a></p>
       </footer>
     </main>
   )
