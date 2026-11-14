@@ -69,6 +69,7 @@ export default function Home() {
         <code>near view passport.hackat.testnet crate_credit_args &#123;token_id: EMBER-001, count: 1&#125;</code>
       </section>
 
+      <p><a href="/history">Reputation history →</a></p>
       <footer>
         <p>DAO <code>genesis.hackat.testnet</code> · Passport <code>passport.hackat.testnet</code> · <a href="https://explorer.testnet.near.org">explorer.testnet.near.org</a></p>
       </footer>

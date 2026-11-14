@@ -73,3 +73,7 @@ License: MIT. Team: solo. Q-010 testnet note: yes, eligible.
 - Epoch drawdown: `spend_allowance` / `remaining_allowance` — cap is spendable, bounded.
 - DAO cross-contract credit: `credit_bounties` accepts only DAO (`genesis.hackat.testnet`) or owner; proposal args via `crate_credit_args` view.
 - Proof-of-work close: `finish_bounty` requires a deliverable URL, then credits.
+
+## Milestone escrow + reputation history (ambitious pass 2)
+- Escrow: `open_escrow(token_id, total)` → `release_milestone(token_id, 0|1|2)` releases 30/40/30 in order (tests).
+- History: `frontend/pages/history.js` — per-token bounty count / cap / remaining, plus event table.

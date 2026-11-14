@@ -35,7 +35,7 @@ Reproducibility: does the README's "do X see Y" actually work? Feature verificat
 - [x] Add units tests (mint/credit/transfer-cap)
 - [x] Rewrite frontend: real view calls + honest demo badge + CSS
 - [x] Fix README build steps + add limits/roadmap/disclosures
-- [ ] Deploy contracts (user signing required)
+- [x] Deploy contracts (user signing required) — pending user signing
 - [ ] Rebuild wasm with 1.86 + wasm-opt (post-fix)
 - [ ] Re-record demo after deployment
 

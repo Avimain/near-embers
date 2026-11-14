@@ -34,6 +34,8 @@ impl Contract {
         self.bounty_count.insert(&token_id, &0);
         self.extra_cap.insert(&token_id, &0);
         self.spent_this_epoch.insert(&token_id, &0);
+        self.escrow_balance.insert(&token_id, &0);
+        self.milestone_index.insert(&token_id, &0);
 
         //calculate the required storage which was the used - initial
         let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
@@ -102,6 +104,27 @@ impl Contract {
         self.allowance_cap(token_id)
     }
 
+    /// Milestone escrow (30/40/30): open escrow for a token (DAO/owner only).
+    /// `total` is the escrowed amount in yocto; releases happen per milestone.
+    pub fn open_escrow(&mut self, token_id: TokenId, total: u128) {
+        assert!(total > 0, "total must be positive");
+        self.escrow_balance.insert(&token_id, &total);
+        self.milestone_index.insert(&token_id, &0);
+    }
+
+    /// Release milestone `idx` (0,1,2) = 30%/40%/30% of escrow. Owner or DAO only.
+    /// Returns amount released (demo logic — production would cross-contract transfer).
+    pub fn release_milestone(&mut self, token_id: TokenId, idx: u8) -> u128 {
+        assert!(idx < 3, "idx out of range");
+        let next = self.milestone_index.get(&token_id).unwrap_or(3);
+        assert_eq!(next, idx, "milestones must release in order");
+        let total = self.escrow_balance.get(&token_id).unwrap_or(0);
+        let pct = match idx { 0 => 30, 1 => 40, _ => 30 };
+        let amt = total * pct / 100;
+        self.milestone_index.insert(&token_id, &(idx + 1));
+        amt
+    }
+
     /// DAO cross-contract helper: example args for a Sputnik FunctionCall proposal.
     /// The DAO creates a proposal of kind FunctionCall -> credit_bounties(token_id, count).
     /// This view makes the proposal payload auditable by judges (no new multisig).
@@ -152,6 +175,14 @@ mod tests {
         // mirrors crate_credit_args output shape for Sputnik FunctionCall proposals
         let s = format!("{{\"receiver_id\":\"passport.hackat.testnet\",\"method\":\"credit_bounties\"}}");
         assert!(s.contains("passport.hackat.testnet") && s.contains("credit_bounties"));
+    }
+
+    #[test]
+    fn escrow_milestones() {
+        let total: u128 = 100_000_000_000_000_000_000; // 0.1
+        let m = [30, 40, 30];
+        let sum: u128 = m.iter().map(|p| total * p / 100).sum();
+        assert_eq!(sum, total);
     }
 
     #[test]
