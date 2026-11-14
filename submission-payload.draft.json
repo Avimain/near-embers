@@ -1,0 +1,14 @@
+{
+  "_note": "DRAFT — do not submit until repo is public + demo X post is live. Generate requestId once with uuidgen, print for explicit yes.",
+  "requestId": "PLACEHOLDER-GENERATE-ONCE",
+  "projectName": "Embers",
+  "leadName": "Avi",
+  "email": "imsdy80nz@mozmail.com",
+  "size": "1",
+  "tracks": ["social", "nfts"],
+  "nearAddress": "hackat.near",
+  "projectUrl": "https://github.com/Avimain/near-embers",
+  "demoUrl": "PLACEHOLDER-X-POST-URL",
+  "idea": "Embers is a bounty board with earned trust for NEAR, built for Social Money and NFTs tracks. Members post small bounties; contributors claim and finish them; payouts flow from a Sputnik DAO treasury (no new multisig). Finished bounties build reputation which unlocks approval tiers (auto / one council / full DAO proposal). Reputation also raises the allowance cap of the contributor's Passport NFT (NEP-171), whose rights move with the token on transfer. Problem: open-source contributor pay is opaque and insider-driven. Product: a transparent, tiered bounty ledger plus a behaviour-bearing passport. NEAR fits: DAO custody, sub-accounts, and on-chain reputation history anyone can verify.",
+  "consent": true
+}
