@@ -34,30 +34,36 @@ cargo build --target wasm32-unknown-unknown --release
 bash scripts/deploy-embers.sh
 ```
 Then:
-- `near view passport.hackat.testnet nft_metadata` → Ember Passport / EMBER
-- `near view passport.hackat.testnet allowance_cap '{"token_id":"EMBER-001"}'`
+- `near view passport2.hackat.testnet nft_metadata` → Ember Passport / EMBER
+- `near view passport2.hackat.testnet allowance_cap '{"token_id":"EMBER-001"}'`
 - DAO: `near view genesis.hackat.testnet get_policy`
 
 ## Architecture
 ```
 hackat.testnet
  ├─ sputnikdao-factory2 → genesis.hackat.testnet (DAO, custody)
- └─ passport.hackat.testnet (NEP-171 + bounty_count/extra_cap, DAO-only credit)
+ └─ passport2.hackat.testnet (NEP-171 + bounty_count/extra_cap, DAO-or-contract-owner-only credit)
 ```
-`credit_bounties` asserts predecessor is the current account (or DAO
-`genesis.hackat.testnet`) — prevents cap inflation. Transfer keeps cap (tests).
+`credit_bounties` asserts predecessor is the contract owner or the DAO
+(`genesis.hackat.testnet`) — token owners cannot self-credit. Transfer keeps cap (tests).
+Note: v1 `passport.hackat.testnet` had a self-credit bug; v2 redeploy to
+`passport2.hackat.testnet` fixed it (Borsh storage added a field, so state can't
+migrate across — fresh account was the clean fix).
 
 ## Tests
 ```bash
-cd contracts/passport && cargo test   # 2 logic tests: cap math, token-bound transfer
+cd contracts/passport && cargo test   # 3 real contract tests — mint→credit→cap, self-credit blocked, transfer keeps cap
 ```
-(VM-context / full e2e transfer tests are roadmap — see Known limits.)
 
 ## Known limits (honest)
-- Mutations are local demo until DAO + Passport deploy and are signable (pending user signing `hackat.testnet`).
+- Contracts are DEPLOYED and live on testnet (DAO `genesis.hackat.testnet`, Passport `passport2.hackat.testnet`). UI mutations are local demo clicks; on-chain flows are verified via explorer.
 - WASM in `deploy/` was built with Rust 1.100 (dev bypass); rebuild with 1.86 + `wasm-opt` before judging.
 - Testnet-only is eligible (Q-010); mainnet needs storage deposit (~0.125 NEAR) + prize receipt on `hackat.near`.
-- No epoch drawdown yet — cap only. (Enhancement 1 below.)
+- v1 `passport.hackat.testnet` still has the old self-credit code (state-desync kept it unredeployable); the live dogfood path is `passport2`. v1 is archived in Appendix notes below.
+- Escrow release is accounting-only (no cross-contract payout transfer).
+
+## Appendix — v1 history
+- v1 `passport.hackat.testnet` (tx 9gZysoJ…) launched with a self-credit bug; fix added `epoch_of` field (Borsh desync) → fresh `passport2` deployment (tx 87t4rgwrxa… init). v1 left untouched.
 
 ## After hackathon (sustainability)
 1. Epoch drawdown `spend_allowance` — cap becomes real money logic.

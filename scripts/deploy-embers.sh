@@ -5,7 +5,7 @@ set -euo pipefail
 NET="testnet"
 FACTORY_ID="hackat.testnet"
 DAO_ID="genesis.hackat.testnet"
-PASSPORT_ID="passport.hackat.testnet"
+PASSPORT_ID="passport2.hackat.testnet"
 
 echo "=== 0. Ensure logged in (account: hackat.testnet) ==="
 echo "Run: near login"
@@ -26,18 +26,18 @@ echo "=== 1b. Deploy factory to ${FACTORY_ID} ==="
 near contract deploy "$FACTORY_ID" use-file "$WASM_FACTORY" without-init-call network-config "$NET" sign-with-keychain send
 
 echo "=== 1c. Init factory ==="
-near contract call-function as-transaction "$FACTORY_ID" new json-args '{}' prepaid-gas 100000000000000 network-config "$NET" sign-with-keychain send
+near contract call-function as-transaction "$FACTORY_ID" new json-args '{}' prepaid-gas "100 TeraGas" network-config "$NET" sign-with-keychain send
 
 echo "=== 2. Create DAO (name/purpose) ==="
 near contract call-function as-transaction "$FACTORY_ID" create_dao \
   json-args '{"name":"Embers DAO","purpose":"Fund contributor bounties fairly and transparently on NEAR"}' \
-  prepaid-gas 100000000000000 network-config "$NET" sign-with-keychain send
+  prepaid-gas "100 TeraGas" network-config "$NET" sign-with-keychain send
 
 echo "=== 3. Passport NFT (prebuilt wasm in deploy/passport.wasm) ==="
-near contract deploy "$PASSPORT_ID" use-file "/Users/graph/.deepai-code/projects/muse-ember-1/deploy/passport.wasm" without-init-call network-config "$NET" sign-with-keychain send
+near contract deploy "$PASSPORT_ID" use-file "deploy/passport-opt.wasm" without-init-call network-config "$NET" sign-with-keychain send
 near contract call-function as-transaction "$PASSPORT_ID" new_default_meta \
   json-args '{"owner_id":"hackat.testnet"}' \
-  prepaid-gas 100000000000000 network-config "$NET" sign-with-keychain send
+  prepaid-gas "100 TeraGas" network-config "$NET" sign-with-keychain send
 
 echo "Done. Verify:"
 echo "  near contract call-function as-read-only $DAO_ID get_policy json-args '{}' network-config $NET"
