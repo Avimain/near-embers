@@ -66,7 +66,7 @@ export default function Home() {
       <section>
         <h2>4 · DAO cross-contract credit (no new multisig)</h2>
         <p>DAO creates a <b>FunctionCall</b> proposal → <code>passport.credit_bounties(token_id, count)</code>. The contract only accepts this from the DAO (or owner). Verify with:</p>
-        <code>near view passport.hackat.testnet crate_credit_args {{"token_id":"EMBER-001","count":1}}</code>
+        <code>near view passport.hackat.testnet crate_credit_args &#123;token_id: EMBER-001, count: 1&#125;</code>
       </section>
 
       <footer>
