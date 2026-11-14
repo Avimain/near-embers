@@ -19,7 +19,7 @@ transfer and a seller cannot keep spend rights.
 cd frontend && npm install && npm run dev   # http://localhost:3000
 ```
 1. Open `/` → board loads with tier badges (demo mutations until deploy).
-2. Click **Claim bounty #1** → status "in progress"; **Mark finished** → "paid ✓", reputation +1, allowance 0.10 → 0.15.
+2. Click **Claim bounty #1** → status "in progress"; **Mark finished** → "paid ✓", reputation +1, allowance 0.10 → 0.105.
 3. The header shows real chain read for `nft_metadata` once deployed (fallback badge until then).
 
 ### Contracts (testnet)
@@ -68,6 +68,10 @@ cd contracts/passport && cargo test   # 2 logic tests: cap math, token-bound tra
 ## Stack
 Next.js (raw JSON-RPC, no SDK — npm `near-api` is squatted), Rust/near-sdk `=5.11.0` pinned.
 License: MIT. Team: solo. Q-010 testnet note: yes, eligible.
+
+## Q-005 disclosure
+NEP-171 base: near-examples `nft-contract-basic` (tutorial) — extension code (allowance, drawdown, escrow, PoW) is ours.
+Known honest limit: `nft_mint` is permissionless in this demo (anyone can mint a passport); production mints gate to the DAO.
 
 ## New in this build (ambitious pass)
 - Epoch drawdown: `spend_allowance` / `remaining_allowance` — cap is spendable, bounded.

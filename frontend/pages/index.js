@@ -8,11 +8,11 @@ async function view(accountId, method, args = {}) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: '1', method: 'query',
       params: { request_type: 'call_function', finality: 'final', account_id: accountId,
-        method_name: method, args: typeof args === 'string' ? args : btoa(JSON.stringify(args)) } }),
+        method_name: method, args_base64: typeof args === 'string' ? args : btoa(JSON.stringify(args)) } }),
   })
   const j = await r.json()
   if (j.error) throw new Error(j.error)
-  return JSON.parse(Buffer.from(j.result.result, 'base64').toString())
+  return JSON.parse(atob(j.result.result))
 }
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
   useEffect(() => {
     view(PASSPORT, 'nft_metadata').then(setLive).catch((e) => setErr(String(e).slice(0, 120)))
   }, [])
-  const capUsd = finished ? '0.15' : '0.10'
+  const capUsd = finished ? '0.105' : '0.10'
   const rep = finished ? 1 : 0
   const remaining = (parseFloat(capUsd) - parseFloat(spent)).toFixed(2)
   return (
@@ -34,7 +34,7 @@ export default function Home() {
         <p>NEAR Hackathon 2026 · Tracks: Social Money + NFTs That Do Something · Solo: Avi</p>
         <p>Payouts flow from a <b>Sputnik DAO</b> — no new multisig. Finish work → reputation rises → your Passport NFT allowance rises.</p>
         <p>{live ? `✅ On-chain: ${live.name}` : err ? `⚠️ Chain view unavailable (demo data below): ${err}` : '⏳ Reading chain…'}</p>
-        <p><small>Demo mode: mutations below are local until contracts are deployed (user-signing pending).</small></p>
+        <p><small>Contracts live on testnet (DAO + Passport deployed). Mutations below are local demo clicks; real flows are on explorer.</small></p>
       </header>
 
       <section>
@@ -65,8 +65,8 @@ export default function Home() {
 
       <section>
         <h2>4 · DAO cross-contract credit (no new multisig)</h2>
-        <p>DAO creates a <b>FunctionCall</b> proposal → <code>passport.credit_bounties(token_id, count)</code>. The contract only accepts this from the DAO (or owner). Verify with:</p>
-        <code>near view passport.hackat.testnet crate_credit_args &#123;token_id: EMBER-001, count: 1&#125;</code>
+        <p>DAO creates a <b>FunctionCall</b> proposal → <code>passport.credit_bounties(token_id, count)</code>. The contract only accepts this from the DAO or the contract owner. Verify with:</p>
+        <code>near view passport.hackat.testnet create_credit_args &#123;token_id: EMBER-001, count: 1&#125;</code>
       </section>
 
       <p><a href="/history">Reputation history →</a></p>

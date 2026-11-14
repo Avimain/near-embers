@@ -54,7 +54,7 @@ pub struct Contract {
     pub extra_cap: UnorderedMap<TokenId, u128>,
     /// Epoch drawdown: total spent in the current epoch per token.
     pub spent_this_epoch: UnorderedMap<TokenId, u128>,
-    pub current_epoch: u64,
+    pub epoch_of: UnorderedMap<TokenId, u64>,
     /// Milestone escrow: escrowed balance + milestone index per token (30/40/30).
     pub escrow_balance: UnorderedMap<TokenId, u128>,
     pub milestone_index: UnorderedMap<TokenId, u8>,
@@ -77,6 +77,7 @@ pub enum StorageKey {
     SpentThisEpoch,
     EscrowBalance,
     MilestoneIndex,
+    EpochOf,
 }
 
 #[near_bindgen]
@@ -125,7 +126,7 @@ impl Contract {
             bounty_count: UnorderedMap::new(StorageKey::BountyCount),
             extra_cap: UnorderedMap::new(StorageKey::ExtraCap),
             spent_this_epoch: UnorderedMap::new(StorageKey::SpentThisEpoch),
-            current_epoch: 0,
+            epoch_of: UnorderedMap::new(StorageKey::EpochOf),
             escrow_balance: UnorderedMap::new(StorageKey::EscrowBalance),
             milestone_index: UnorderedMap::new(StorageKey::MilestoneIndex),
         };

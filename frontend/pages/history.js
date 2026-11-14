@@ -9,11 +9,11 @@ async function view(accountId, method, args = {}) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: '1', method: 'query',
       params: { request_type: 'call_function', finality: 'final', account_id: accountId,
-        method_name: method, args: typeof args === 'string' ? args : btoa(JSON.stringify(args)) } }),
+        method_name: method, args_base64: typeof args === 'string' ? args : btoa(JSON.stringify(args)) } }),
   })
   const j = await r.json()
   if (j.error) throw new Error(j.error)
-  return JSON.parse(Buffer.from(j.result.result, 'base64').toString())
+  return JSON.parse(atob(j.result.result))
 }
 
 export default function History() {
