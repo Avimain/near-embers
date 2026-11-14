@@ -84,8 +84,8 @@ impl Contract {
             owner_id,
             NFTContractMetadata {
                 spec: "nft-1.0.0".to_string(),
-                name: "NFT Tutorial Contract".to_string(),
-                symbol: "GOTEAM".to_string(),
+                name: "Ember Passport".to_string(),
+                symbol: "EMBER".to_string(),
                 icon: None,
                 base_uri: None,
                 reference: None,

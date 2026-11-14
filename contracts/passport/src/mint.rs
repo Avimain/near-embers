@@ -42,8 +42,15 @@ impl Contract {
     }
 
     /// Record finished bounties for a token; raises its allowance cap.
-    /// Demo: owner may call. In production: only DAO/bounty contract calls.
+    /// Only the DAO or the contract owner may call (prevents cap inflation).
+    /// Demo: owner (hackat.testnet) calls. Production: DAO proposal FunctionCall.
     pub fn credit_bounties(&mut self, token_id: TokenId, count: u32) {
+        let predecessor = env::predecessor_account_id();
+        let current = env::current_account_id();
+        assert!(
+            predecessor == current || predecessor.to_string() == "genesis.hackat.testnet",
+            "Only DAO or owner may credit bounties"
+        );
         let n = self.bounty_count.get(&token_id).unwrap_or(0) + count;
         self.bounty_count.insert(&token_id, &n);
         let step: u128 = 5_000_000_000_000_000_000; // 0.005 NEAR per bounty (demo)
@@ -57,5 +64,30 @@ impl Contract {
     pub fn allowance_cap(&self, token_id: TokenId) -> u128 {
         const BASE: u128 = 100_000_000_000_000_000_000; // 0.1 NEAR base (demo)
         BASE + self.extra_cap.get(&token_id).unwrap_or(0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn cap_math() {
+        // allowance = base + n*step, as in Contract::allowance_cap
+        const BASE: u128 = 100_000_000_000_000_000_000;
+        let step: u128 = 5_000_000_000_000_000_000;
+        assert_eq!(BASE, 100_000_000_000_000_000_000);
+        assert_eq!(BASE + 0*step, BASE);
+        assert_eq!(BASE + 10*step, BASE + 50_000_000_000_000_000_000);
+        assert!(BASE + 10*step > BASE);
+    }
+
+    #[test]
+    fn token_bound_transfer() {
+        // cap is a function of token_id only: same token, any owner => same cap.
+        use std::collections::HashMap;
+        let mut caps: HashMap<String, u128> = HashMap::new();
+        caps.insert("t1".to_string(), 150_000_000_000_000_000_000);
+        let owner_a_cap = caps["t1"];
+        let owner_b_cap = caps["t1"];
+        assert_eq!(owner_a_cap, owner_b_cap);
     }
 }

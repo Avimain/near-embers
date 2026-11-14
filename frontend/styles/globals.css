@@ -1,0 +1,9 @@
+body { font-family: system-ui, -apple-system, sans-serif; margin: 2rem auto; max-width: 860px; padding: 0 1rem; line-height: 1.5; background: #0b1220; color: #e6edf3; }
+header, section, footer { margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #22314a; border-radius: 12px; background: #111b2e; }
+h1 { font-size: 1.6rem; } h2 { font-size: 1.15rem; color: #ff9d5c; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #2b3c5c; padding: .5rem; text-align: left; }
+button { background: #ff7a1a; color: #fff; border: 0; padding: .5rem 1rem; border-radius: 8px; cursor: pointer; }
+button:disabled { background: #4a5568; cursor: default; }
+a { color: #58a6ff; }
+code { background: #1b2740; padding: .1rem .3rem; border-radius: 4px; }
