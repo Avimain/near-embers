@@ -68,3 +68,8 @@ cd contracts/passport && cargo test   # 2 logic tests: cap math, token-bound tra
 ## Stack
 Next.js (raw JSON-RPC, no SDK — npm `near-api` is squatted), Rust/near-sdk `=5.11.0` pinned.
 License: MIT. Team: solo. Q-010 testnet note: yes, eligible.
+
+## New in this build (ambitious pass)
+- Epoch drawdown: `spend_allowance` / `remaining_allowance` — cap is spendable, bounded.
+- DAO cross-contract credit: `credit_bounties` accepts only DAO (`genesis.hackat.testnet`) or owner; proposal args via `crate_credit_args` view.
+- Proof-of-work close: `finish_bounty` requires a deliverable URL, then credits.

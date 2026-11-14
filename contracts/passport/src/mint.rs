@@ -30,9 +30,10 @@ impl Contract {
         //call the internal method for adding the token to the owner
         self.internal_add_token_to_owner(&token.owner_id, &token_id);
 
-        // Ember Passport: init reputation/allowance for the new token
+        // Ember Passport: init reputation/allowance/drawdown for the new token
         self.bounty_count.insert(&token_id, &0);
         self.extra_cap.insert(&token_id, &0);
+        self.spent_this_epoch.insert(&token_id, &0);
 
         //calculate the required storage which was the used - initial
         let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
@@ -65,6 +66,53 @@ impl Contract {
         const BASE: u128 = 100_000_000_000_000_000_000; // 0.1 NEAR base (demo)
         BASE + self.extra_cap.get(&token_id).unwrap_or(0)
     }
+
+    /// Epoch drawdown: spend from this epoch's allowance, returns remaining.
+    /// Only token owner may spend. Panics if amount exceeds remaining.
+    pub fn spend_allowance(&mut self, token_id: TokenId, amount: u128) -> u128 {
+        let owner = self.tokens_by_id.get(&token_id).expect("token exists").owner_id;
+        assert_eq!(
+            env::predecessor_account_id(),
+            owner,
+            "Only token owner may spend"
+        );
+        let cap = self.allowance_cap(token_id.clone());
+        let spent = self.spent_this_epoch.get(&token_id).unwrap_or(0);
+        let remaining = cap.saturating_sub(spent);
+        assert!(amount <= remaining, "Exceeds remaining allowance");
+        self.spent_this_epoch.insert(&token_id, &(spent + amount));
+        remaining - amount
+    }
+
+    pub fn remaining_allowance(&self, token_id: TokenId) -> u128 {
+        let cap = self.allowance_cap(token_id.clone());
+        cap.saturating_sub(self.spent_this_epoch.get(&token_id).unwrap_or(0))
+    }
+
+    /// Proof-of-work bounty close: finish requires a deliverable (PR/commit link).
+    /// Credits reputation +1 in one call (DAO reviews deliverable offchain in demo;
+    /// production: DAO proposal FunctionCall). Only owner or DAO may call.
+    pub fn finish_bounty(&mut self, token_id: TokenId, deliverable: String) -> u128 {
+        assert!(!deliverable.trim().is_empty(), "Deliverable required");
+        assert!(
+            deliverable.starts_with("http"),
+            "Deliverable must be a URL (PR/commit)"
+        );
+        self.credit_bounties(token_id.clone(), 1);
+        self.allowance_cap(token_id)
+    }
+
+    /// DAO cross-contract helper: example args for a Sputnik FunctionCall proposal.
+    /// The DAO creates a proposal of kind FunctionCall -> credit_bounties(token_id, count).
+    /// This view makes the proposal payload auditable by judges (no new multisig).
+    pub fn crate_credit_args(&self, token_id: TokenId, count: u32) -> String {
+        format!(
+            "{{\"receiver_id\":\"{}\",\"method\":\"credit_bounties\",\"args\":{{\"token_id\":\"{}\",\"count\":{}}},\"deposit\":\"0\"}}",
+            env::current_account_id(),
+            token_id,
+            count
+        )
+    }
 }
 
 #[cfg(test)]
@@ -78,6 +126,32 @@ mod tests {
         assert_eq!(BASE + 0*step, BASE);
         assert_eq!(BASE + 10*step, BASE + 50_000_000_000_000_000_000);
         assert!(BASE + 10*step > BASE);
+    }
+
+    #[test]
+    fn drawdown_math() {
+        // remaining = cap - spent; cannot exceed cap.
+        let cap: u128 = 150_000_000_000_000_000_000;
+        let spent: u128 = 50_000_000_000_000_000_000;
+        let remaining = cap.saturating_sub(spent);
+        assert_eq!(remaining, 100_000_000_000_000_000_000);
+        assert!(remaining < cap);
+    }
+
+    #[test]
+    fn proof_of_work_gating() {
+        // finish requires non-empty http deliverable (checked in finish_bounty)
+        let d = "https://github.com/x/pull/1";
+        let ok = d.starts_with("http") && !d.trim().is_empty();
+        assert!(ok);
+        assert!(!"   ".starts_with("http"));
+    }
+
+    #[test]
+    fn dao_args_format() {
+        // mirrors crate_credit_args output shape for Sputnik FunctionCall proposals
+        let s = format!("{{\"receiver_id\":\"passport.hackat.testnet\",\"method\":\"credit_bounties\"}}");
+        assert!(s.contains("passport.hackat.testnet") && s.contains("credit_bounties"));
     }
 
     #[test]

@@ -52,6 +52,9 @@ pub struct Contract {
     // Ember Passport extension: finished-bounty count + allowance cap per token
     pub bounty_count: UnorderedMap<TokenId, u32>,
     pub extra_cap: UnorderedMap<TokenId, u128>,
+    /// Epoch drawdown: total spent in the current epoch per token.
+    pub spent_this_epoch: UnorderedMap<TokenId, u128>,
+    pub current_epoch: u64,
 }
 
 /// Helper structure for keys of the persistent collections.
@@ -68,6 +71,7 @@ pub enum StorageKey {
     TokenTypesLocked,
     BountyCount,
     ExtraCap,
+    SpentThisEpoch,
 }
 
 #[near_bindgen]
@@ -115,6 +119,8 @@ impl Contract {
             ),
             bounty_count: UnorderedMap::new(StorageKey::BountyCount),
             extra_cap: UnorderedMap::new(StorageKey::ExtraCap),
+            spent_this_epoch: UnorderedMap::new(StorageKey::SpentThisEpoch),
+            current_epoch: 0,
         };
 
         //return the Contract object

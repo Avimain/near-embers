@@ -20,11 +20,13 @@ export default function Home() {
   const [finished, setFinished] = useState(false)
   const [live, setLive] = useState(null)
   const [err, setErr] = useState('')
+  const [spent, setSpent] = useState('0')
   useEffect(() => {
     view(PASSPORT, 'nft_metadata').then(setLive).catch((e) => setErr(String(e).slice(0, 120)))
   }, [])
-  const cap = finished ? '0.15' : '0.10'
+  const capUsd = finished ? '0.15' : '0.10'
   const rep = finished ? 1 : 0
+  const remaining = (parseFloat(capUsd) - parseFloat(spent)).toFixed(2)
   return (
     <main>
       <header>
@@ -46,17 +48,25 @@ export default function Home() {
       </section>
 
       <section>
-        <h2>2 · Claim + finish</h2>
+        <h2>2 · Claim + proof-of-work finish</h2>
         <button disabled={claimed} onClick={() => setClaimed(true)}>Claim bounty #1</button>{' '}
-        <button disabled={!claimed || finished} onClick={() => setFinished(true)}>Mark finished → payout</button>
-        {finished && <p>✅ Payout sent: 0.05 NEAR · reputation +1 (demo — no tx yet until DAO deploys)</p>}
+        <input placeholder="Deliverable URL (PR/commit)" id="deliv" style={{ width: 220 }} />{' '}
+        <button disabled={!claimed || finished} onClick={() => setFinished(true)}>Finish with deliverable → payout</button>
+        {finished && <p>✅ Payout sent: 0.05 NEAR · reputation +1 (demo — DAO signs off deliverable, then credits)</p>}
       </section>
 
       <section>
-        <h2>3 · Passport NFT — allowance rises with reputation</h2>
+        <h2>3 · Passport NFT — epoch drawdown</h2>
         <p>Token <code>EMBER-001</code> · Owner <code>hackat.testnet</code></p>
-        <p>Reputation: <b>{rep}</b> finished bounty · Allowance cap: <b>{cap} NEAR / epoch</b>{finished && ' ↑'}</p>
+        <p>Reputation: <b>{rep}</b> · Cap: <b>{capUsd} NEAR/epoch</b> · Spent this epoch: <b>{spent}</b> · Remaining: <b>{remaining}</b></p>
+        <button disabled={spent >= capUsd} onClick={() => setSpent((parseFloat(spent) + 0.05).toFixed(2))}>Spend 0.05 (demo)</button>
         <p><small>Allowance is bound to the token: on transfer, the new owner gets the cap — seller cannot keep spend rights.</small></p>
+      </section>
+
+      <section>
+        <h2>4 · DAO cross-contract credit (no new multisig)</h2>
+        <p>DAO creates a <b>FunctionCall</b> proposal → <code>passport.credit_bounties(token_id, count)</code>. The contract only accepts this from the DAO (or owner). Verify with:</p>
+        <code>near view passport.hackat.testnet crate_credit_args {{"token_id":"EMBER-001","count":1}}</code>
       </section>
 
       <footer>
