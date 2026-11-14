@@ -1,0 +1,15 @@
+This is Embers, a bounty board with earned trust, built on NEAR for the hackathon.
+
+Payouts flow from a Sputnik D-A-O. No new multisig, just what communities do with the one they already have.
+
+One: post a bounty. Small ones auto-approve. Bigger ones go to the council. The biggest go to a full D-A-O vote.
+
+Two: claim it, and finish it with proof of work. A deliverable link, like a pull request. Then reputation rises, and the payout is sent.
+
+Three: your Passport N-F-T is the receipt. Every finished bounty raises its epoch allowance. That allowance is bound to the token, not the person, so when it moves, the rights move with it.
+
+Four: the D-A-O can credit reputation cross-contract, straight from a proposal. No middleman.
+
+And on the history page, every step is public. Bounty, credit, drawdown.
+
+Embers. Finish the work. Earn the trust.
